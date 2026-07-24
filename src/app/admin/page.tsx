@@ -320,7 +320,7 @@ export default function AdminPage() {
                 value={username}
                 onChange={(event) => setUsername(event.target.value)}
                 className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-indigo-500 dark:border-gray-600 dark:bg-gray-900"
-                placeholder="admin"
+                placeholder=""
               />
             </div>
             <div>
@@ -330,7 +330,7 @@ export default function AdminPage() {
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-indigo-500 dark:border-gray-600 dark:bg-gray-900"
-                placeholder="admin123"
+                placeholder=""
               />
             </div>
             {loginError ? <p className="text-sm text-red-500">{loginError}</p> : null}
