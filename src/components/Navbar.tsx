@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import ThemeChanger from "./DarkSwitch";
-import Image from "next/image"
+import Image from "next/image";
 import { Disclosure } from "@headlessui/react";
 
 export default function Navbar() {
@@ -14,52 +14,49 @@ export default function Navbar() {
   ];
 
   return (
-    <div className="w-full">
-      <nav className="container relative flex flex-wrap items-center justify-between p-8 pr-8 mx-auto lg:mx-12 lg:justify-between xl:px-1">
-        {/* Logo  */}
-        <Link href="/">
-          <span className="flex items-center space-x-2 text-2xl font-medium text-indigo-500 dark:text-gray-100">
-              <span>
-                <Image
-                  src="/img/SC Logo New.png"
-                  width="64"
-                  alt="N"
-                  height="64"
-                  className="w-18"
-                />
-              </span>
-            <span>Shan Cyber</span>
+    <div className="w-full border-b border-gray-100 bg-white/90 backdrop-blur-sm dark:border-gray-800 dark:bg-gray-900/90">
+      <nav className="container relative mx-auto flex max-w-7xl flex-wrap items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+        <Link href="/" className="flex items-center space-x-2 text-lg font-medium text-indigo-500 dark:text-gray-100 sm:text-xl">
+          <span className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-white shadow-sm dark:bg-gray-800">
+            <Image
+              src="/img/SC Logo New.png"
+              width={48}
+              height={48}
+              alt="Shan Cyber logo"
+              className="h-full w-full object-contain"
+            />
           </span>
+          <span className="truncate">Shan Cyber</span>
         </Link>
 
-        {/* get started  */}
-        <div className="flex items-center gap-3 mr-4 ml-auto lg:ml-0 lg:order-2">
-            <ThemeChanger />
-            <div className="hidden mr-3 lg:flex">
-              <Link href="/" className="px-6 py-2 text-white bg-indigo-600 rounded-md md:ml-5">
-                Get Started
-              </Link>
-            </div>
-        </div>
-                
-        <Disclosure>
-          {({ open }) => (
-            <>
+        <div className="flex items-center gap-2 sm:gap-3 lg:order-3">
+          <ThemeChanger />
+          <Link
+            href="/"
+            className="hidden rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-700 sm:inline-flex"
+          >
+            Get Started
+          </Link>
+
+          <Disclosure as="div" className="lg:hidden">
+            {({ open }) => (
+              <>
                 <Disclosure.Button
                   aria-label="Toggle Menu"
-                  className="px-2 py-1 text-gray-500 rounded-md lg:hidden hover:text-indigo-500 focus:text-indigo-500 focus:bg-indigo-100 focus:outline-none dark:text-gray-300 dark:focus:bg-trueGray-700">
+                  className="inline-flex items-center justify-center rounded-md p-2 text-gray-600 transition hover:bg-indigo-100 hover:text-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-gray-300 dark:hover:bg-gray-800"
+                >
                   <svg
-                    className="w-6 h-6 fill-current"
+                    className="h-6 w-6 fill-current"
                     xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24">
-                    {open && (
+                    viewBox="0 0 24 24"
+                  >
+                    {open ? (
                       <path
                         fillRule="evenodd"
                         clipRule="evenodd"
                         d="M18.278 16.864a1 1 0 0 1-1.414 1.414l-4.829-4.828-4.828 4.828a1 1 0 0 1-1.414-1.414l4.828-4.829-4.828-4.828a1 1 0 0 1 1.414-1.414l4.829 4.828 4.828-4.828a1 1 0 1 1 1.414 1.414l-4.828 4.829 4.828 4.828z"
                       />
-                    )}
-                    {!open && (
+                    ) : (
                       <path
                         fillRule="evenodd"
                         d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"
@@ -68,34 +65,44 @@ export default function Navbar() {
                   </svg>
                 </Disclosure.Button>
 
-                <Disclosure.Panel className="flex flex-wrap w-full my-5 lg:hidden">
-                  <>
+                <Disclosure.Panel className="basis-full lg:hidden">
+                  <div className="mt-3 rounded-lg border border-gray-200 bg-white p-3 shadow-sm dark:border-gray-700 dark:bg-gray-900">
                     {navigation.map((item, index) => (
-                      <Link key={index} href={item.href} className="w-full px-4 py-2 -ml-4 text-gray-500 rounded-md dark:text-gray-300 hover:text-indigo-500 focus:text-indigo-500 focus:bg-indigo-100 dark:focus:bg-gray-800 focus:outline-none">
-                          {item.name}
+                      <Link
+                        key={index}
+                        href={item.href}
+                        className="block rounded-md px-3 py-2 text-gray-600 transition hover:bg-indigo-50 hover:text-indigo-500 dark:text-gray-300 dark:hover:bg-gray-800"
+                      >
+                        {item.name}
                       </Link>
                     ))}
-                    <Link href="/" className="w-full px-6 py-2 mt-3 text-center text-white bg-indigo-600 rounded-md lg:ml-5">         
-                        Get Started
+                    <Link
+                      href="/"
+                      className="mt-2 flex w-full items-center justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white"
+                    >
+                      Get Started
                     </Link>
-                  </>
+                  </div>
                 </Disclosure.Panel>
-            </>
-          )}
-        </Disclosure>
-        
-        <div className="hidden text-center lg:flex lg:items-center">
-          <ul className="items-center justify-end flex-1 pt-6 list-none lg:pt-0 lg:flex">
+              </>
+            )}
+          </Disclosure>
+        </div>
+
+        <div className="hidden flex-1 justify-center lg:flex">
+          <ul className="flex items-center gap-1">
             {navigation.map((menu, index) => (
-              <li className="mr-3 nav__item" key={index}>
-                <Link href={menu.href} className="inline-block px-4 py-2 text-lg font-normal text-gray-800 no-underline rounded-md dark:text-gray-200 hover:text-indigo-500 focus:text-indigo-500 focus:bg-indigo-100 focus:outline-none dark:focus:bg-gray-800">
-                    {menu.name}
+              <li key={index}>
+                <Link
+                  href={menu.href}
+                  className="rounded-md px-4 py-2 text-base font-normal text-gray-800 transition hover:text-indigo-500 focus:outline-none dark:text-gray-200"
+                >
+                  {menu.name}
                 </Link>
               </li>
             ))}
           </ul>
         </div>
-
       </nav>
     </div>
   );
