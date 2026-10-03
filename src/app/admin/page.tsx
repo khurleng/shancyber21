@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Container } from '@/components/Container';
 import { SectionTitle } from '@/components/SectionTitle';
 import { ImageUrlPreview } from '@/components/ImageUrlPreview';
+import { PostEditor } from '@/components/PostEditor';
 
 
 
@@ -401,8 +402,7 @@ export default function AdminPage() {
                     <textarea required value={postForm.excerpt} onChange={(event) => setPostForm({ ...postForm, excerpt: event.target.value })} className="min-h-24 w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-indigo-500 dark:border-gray-600 dark:bg-gray-900" />
                   </div>
                   <div className="md:col-span-2">
-                    <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">Content (use # for heading, **bold** for bold text)</label>
-                    <textarea required value={postForm.content} onChange={(event) => setPostForm({ ...postForm, content: event.target.value })} className="min-h-36 w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-indigo-500 dark:border-gray-600 dark:bg-gray-900" />
+                    <PostEditor key={editingPostId ?? 'new-post'} value={postForm.content} onChange={(content) => setPostForm({ ...postForm, content })} />
                   </div>
                 </div>
                 <button type="submit" disabled={isSubmitting} className="mt-4 rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60">

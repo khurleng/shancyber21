@@ -2,52 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { getPostById } from "@/lib/contentStore";
-
-function renderInlineText(text: string) {
-  const parts = text.split(/(\*\*[^*]+\*\*)/g).filter(Boolean);
-
-  return parts.map((part, index) => {
-    const boldMatch = part.match(/^\*\*(.+)\*\*$/);
-
-    if (boldMatch) {
-      return <strong key={`${part}-${index}`}>{boldMatch[1]}</strong>;
-    }
-
-    return <span key={`${part}-${index}`}>{part}</span>;
-  });
-}
-
-function renderRichContent(content: string) {
-  const trimmed = content.trim();
-
-  if (!trimmed) {
-    return null;
-  }
-
-  const headingMatch = trimmed.match(/^#\s+(.+)$/);
-  if (headingMatch) {
-    return (
-      <h2 className="mb-3 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-        {renderInlineText(headingMatch[1])}
-      </h2>
-    );
-  }
-
-  const subHeadingMatch = trimmed.match(/^##\s+(.+)$/);
-  if (subHeadingMatch) {
-    return (
-      <h3 className="mb-2 text-xl font-semibold text-gray-800 dark:text-gray-200">
-        {renderInlineText(subHeadingMatch[1])}
-      </h3>
-    );
-  }
-
-  return (
-    <p className="text-justify text-lg leading-8 text-gray-700 dark:text-gray-300">
-      {renderInlineText(trimmed)}
-    </p>
-  );
-}
+import { PostContent } from "@/components/PostContent";
 
 type BlogDetailPageProps = {
   params: {
@@ -103,11 +58,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
           {article.title}
         </h1>
 
-        <div className="shan-text space-y-5">
-          {article.content.map((paragraph) => (
-            <div key={paragraph}>{renderRichContent(paragraph)}</div>
-          ))}
-        </div>
+        <PostContent content={article.content} />
       </article>
     </div>
   );
