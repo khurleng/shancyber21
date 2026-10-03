@@ -1,21 +1,15 @@
 import { NextResponse } from "next/server";
 import { createProduct, getProducts } from "@/lib/contentStore";
-
-export async function GET() {
-  const products = await getProducts();
-  return NextResponse.json(products);
+import { api, readBody, requireAdmin } from "@/lib/supabase";
+import { validateContent } from "../../../../backend/lib/validation.mjs";
+export const dynamic = "force-dynamic";
+export async function GET(request: Request) {
+  return api(request, async () => NextResponse.json(await getProducts()));
 }
-
 export async function POST(request: Request) {
-  const body = await request.json();
-
-  if (!body?.title || !body?.description) {
-    return NextResponse.json(
-      { message: "Title and description are required." },
-      { status: 400 }
-    );
-  }
-
-  const product = await createProduct(body);
-  return NextResponse.json(product, { status: 201 });
+  return api(request, async () => {
+    await requireAdmin();
+    const body = validateContent("products", await readBody(request)) as { title: string; description: string };
+    return NextResponse.json(await createProduct(body), { status: 201 });
+  });
 }

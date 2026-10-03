@@ -32,3 +32,14 @@ yarn-error.log*
 
 # vercel
 .vercel
+
+.env
+.env.*
+!.env.example
+/backend/supabase/.temp/
+/backend/supabase/.branches/
+*.tsbuildinfo
+
+# Local development logs and retired credentials
+next-dev*.log
+/src/data/admin.json

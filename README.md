@@ -60,3 +60,8 @@ Surjith S M ( [@surjithctly](https://surjithctly.in/) )
 
 [![image](https://www.datocms-assets.com/31049/1618983297-powered-by-vercel.svg)](https://vercel.com/?utm_source=web3templates&utm_campaign=oss)
 
+
+## Supabase backend
+
+The local backend setup, migrations, seed data, admin authentication, and test instructions are in [backend/README.md](backend/README.md). Start with that guide to connect the app to Supabase.
+

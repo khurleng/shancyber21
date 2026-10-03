@@ -1,58 +1,26 @@
-import { promises as fs } from "fs";
-import path from "path";
-
-export interface AdminConfig {
-  username: string;
-  password: string;
+import { ApiError, supabase } from "./supabase";
+export interface AuthSession {
+  access_token: string;
+  expires_in: number;
+  user: { id: string; email: string };
 }
-
-const adminConfigPath = path.join(process.cwd(), "src", "data", "admin.json");
-
-const defaultAdminConfig: AdminConfig = {
-  username: "admin",
-  password: "admin123",
-};
-
-async function readAdminConfig(): Promise<AdminConfig> {
+export async function signInAdmin(email: string, password: string): Promise<AuthSession> {
+  if (typeof email !== "string" || typeof password !== "string" || !email.includes("@") || !password || email.length > 320 || password.length > 1024) {
+    throw new ApiError("A valid email and password are required.");
+  }
+  let session: AuthSession;
   try {
-    const fileContents = await fs.readFile(adminConfigPath, "utf8");
-    return JSON.parse(fileContents) as AdminConfig;
+    session = await supabase<AuthSession>("/auth/v1/token?grant_type=password", {
+      method: "POST", body: JSON.stringify({ email, password }),
+    });
   } catch (error) {
-    const err = error as NodeJS.ErrnoException;
-    if (err.code === "ENOENT") {
-      await writeAdminConfig(defaultAdminConfig);
-      return defaultAdminConfig;
-    }
+    if (error instanceof ApiError && [400, 401].includes(error.status)) throw new ApiError("Invalid email or password.", 401);
     throw error;
   }
-}
-
-async function writeAdminConfig(config: AdminConfig): Promise<void> {
-  await fs.mkdir(path.dirname(adminConfigPath), { recursive: true });
-  await fs.writeFile(adminConfigPath, JSON.stringify(config, null, 2), "utf8");
-}
-
-export async function getAdminConfig(): Promise<AdminConfig> {
-  return readAdminConfig();
-}
-
-export async function validateAdminLogin(username: string, password: string): Promise<boolean> {
-  const config = await readAdminConfig();
-  return config.username === username && config.password === password;
-}
-
-export async function updateAdminPassword(currentPassword: string, newPassword: string): Promise<boolean> {
-  const config = await readAdminConfig();
-
-  if (config.password !== currentPassword) {
-    return false;
+  const rows = await supabase<{ user_id: string }[]>(`/rest/v1/admin_users?user_id=eq.${encodeURIComponent(session.user.id)}&select=user_id`, {}, session.access_token);
+  if (!rows.length) {
+    await supabase("/auth/v1/logout", { method: "POST" }, session.access_token);
+    throw new ApiError("This account does not have administrator access.", 403);
   }
-
-  const nextConfig: AdminConfig = {
-    ...config,
-    password: newPassword,
-  };
-
-  await writeAdminConfig(nextConfig);
-  return true;
+  return session;
 }

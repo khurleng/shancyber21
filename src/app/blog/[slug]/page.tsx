@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Container } from "@/components/Container";
-import { getPostById, getPosts } from "@/lib/contentStore";
+
+import { getPostById } from "@/lib/contentStore";
 
 function renderInlineText(text: string) {
   const parts = text.split(/(\*\*[^*]+\*\*)/g).filter(Boolean);
@@ -55,12 +55,7 @@ type BlogDetailPageProps = {
   };
 };
 
-export async function generateStaticParams() {
-  const articles = await getPosts();
-  return articles.map((article) => ({
-    slug: article.id,
-  }));
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: BlogDetailPageProps) {
   const article = await getPostById(params.slug);
@@ -85,13 +80,13 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
   }
 
   return (
-    <Container>
+    <div className="shell">
       <article className="mx-auto max-w-3xl py-10">
         <Link
           href="/blog"
-          className="mb-8 inline-flex text-sm font-semibold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
+          className="text-link mb-8"
         >
-          Back to blog
+          ← Back to journal
         </Link>
 
         <img
@@ -113,6 +108,6 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
           ))}
         </div>
       </article>
-    </Container>
+    </div>
   );
 }

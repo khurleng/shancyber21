@@ -1,134 +1,17 @@
-import Link from "next/link";
-import { Container } from "@/components/Container";
+﻿import Link from "next/link";
 import { Hero } from "@/components/Hero";
-import { SectionTitle } from "@/components/SectionTitle";
-import { Benefits } from "@/components/Benefits";
-import { Video } from "@/components/Video";
-import { Testimonials } from "@/components/Testimonials";
-import { Faq } from "@/components/Faq";
-import { Cta } from "@/components/Cta";
-
-import { benefitOne, benefitTwo } from "@/components/data";
-import { articles } from "./blog/articles";
-import { products } from "./product/products";
-export default function Home() {
-  const recentProducts = products.slice(0, 2);
-
-  const recentPosts = articles
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    .slice(0, 2)
-    .map((article) => ({
-      id: article.id,
-      title: article.title,
-      description: article.excerpt,
-      action: "Read More",
-      image: article.image,
-    }));
-
-  return (
-    <Container>
-      <Hero />
-      <SectionTitle
-        preTitle="Our Services"
-        title=" Why Shan Cyber"
-      >
-        Shan Cyber provides computer repair services, 
-        sells IT equipment, and offers web design and development solutions. 
-        We also specialize in graphic design services, including posters, logos, 
-        and infographics for marketing purposes.
-      </SectionTitle>
-
-      <Benefits data={benefitOne} />
-      <Benefits imgPos="right" data={benefitTwo} />
-
-      <SectionTitle preTitle="Products" title="Recently added products">
-        A quick preview of our featured products. Click through to see the full list.
-      </SectionTitle>
-
-      <div className="grid gap-8 md:grid-cols-2 mb-16">
-        {recentProducts.map((product, index) => (
-          <div key={index} className="overflow-hidden rounded-xl bg-white shadow-lg dark:bg-gray-800">
-            <img
-              src={product.image}
-              alt={product.title}
-              className="object-cover w-full h-48"
-            />
-            <div className="p-6">
-              <h3 className="mb-3 text-2xl font-semibold text-gray-800 dark:text-gray-100">
-                {product.title}
-              </h3>
-              <p className="mb-6 text-gray-600 dark:text-gray-300">
-                {product.description}
-              </p>
-              <a
-                href={product.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center px-5 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
-              >
-                {product.buttonText}
-              </a>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <SectionTitle preTitle="Blog" title="Recent articles">
-        Read the latest updates and insights from our blog.
-      </SectionTitle>
-
-      <div className="grid gap-8 md:grid-cols-2 mb-16">
-        {recentPosts.map((post, index) => (
-          <div key={index} className="overflow-hidden rounded-xl bg-white shadow-lg dark:bg-gray-800">
-            <img
-              src={post.image}
-              alt={post.title}
-              className="object-cover w-full h-48"
-            />
-            <div className="p-6">
-              <h3 className="mb-3 text-2xl font-semibold text-gray-800 dark:text-gray-100">
-                {post.title}
-              </h3>
-              <p className="mb-6 text-gray-600 dark:text-gray-300">
-                {post.description}
-              </p>
-              <Link
-                href={`/blog/${post.id}`}
-                className="inline-flex items-center justify-center px-5 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
-              >
-                {post.action}
-              </Link>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <SectionTitle
-        preTitle="Watch a video"
-        title="Learn how to fullfil your needs"
-      >
-        This section is, Learn how to fulfill your needs with the right digital skills and technology solutions.
-      </SectionTitle>
-
-      <Video videoId="14AfdzJSW-c" />
-
-      {/* <SectionTitle
-        preTitle="Testimonials"
-        title="Here's what our customers said"
-      >
-        Testimonials is a great way to increase the brand trust and awareness.
-        Use this section to highlight your popular customers.
-      </SectionTitle> */}
-
-      {/* <Testimonials /> */}
-
-      <SectionTitle preTitle="FAQ" title="Frequently Asked Questions">
-        Answer your customers possible questions here, it will increase the
-        conversion rate as well as support or chat requests.
-      </SectionTitle>
-
-      <Faq />
-      <Cta />
-    </Container>
-  );
+import { getPosts, getProducts } from "@/lib/contentStore";
+import { WrenchScrewdriverIcon, ComputerDesktopIcon, CodeBracketIcon, PaintBrushIcon } from "@heroicons/react/24/outline";
+export const dynamic = "force-dynamic";
+const services=[{icon:WrenchScrewdriverIcon,title:"Computer care",text:"A fresh start for your everyday tech. Reliable repairs, upgrades, and support.",tag:"REPAIR & SUPPORT"},{icon:ComputerDesktopIcon,title:"The right tech",text:"Equipment that works as hard as you do. Find the right tools for your next step.",tag:"IT EQUIPMENT"},{icon:CodeBracketIcon,title:"Web experiences",text:"Your ideas deserve a home online. Thoughtful websites, built around your business.",tag:"DESIGN & DEVELOPMENT"},{icon:PaintBrushIcon,title:"Design that speaks",text:"Stand out and tell your story with memorable logos, posters, and visual identities.",tag:"GRAPHIC DESIGN"}];
+export default async function Home(){
+ const [products,posts]=await Promise.all([getProducts(),getPosts()]);
+ const recent=[...posts].sort((a,b)=>new Date(b.date).getTime()-new Date(a.date).getTime()).slice(0,2);
+ return <><Hero/><div className="expertise-strip"><div className="shell"><span>A LITTLE OF WHAT WE DO</span><b>Build better.</b><i>✳</i><b>Think creatively.</b><i>✳</i><b>Learn something new.</b><i>✳</i><b>Go further.</b></div></div>
+ <section className="shell section" id="services"><div className="section-heading"><div><div className="eyebrow">01 / WHAT WE DO</div><h2>Good people.<br/>Great digital solutions.</h2></div><p>Practical support. Thoughtful design. Real possibilities.<br/>Everything you need to take your next step, all in one place.</p></div><div className="services-grid">{services.map((s,i)=><a href={i===1?"/product":"#contact"} className="service-card" key={s.title}><div className="service-top"><s.icon/><span>0{i+1}</span></div><span className="card-eyebrow">{s.tag}</span><h3>{s.title}</h3><p>{s.text}</p><span className="card-arrow" aria-hidden="true">↗</span></a>)}</div></section>
+ <section className="about-section" id="about"><div className="shell about-grid"><div className="about-symbol" aria-hidden="true">✳<span>LOCAL ROOTS. DIGITAL REACH.</span></div><div><div className="eyebrow">MORE THAN TECHNOLOGY</div><h2>A digital future.<br/>For all of us.</h2><p>We’re Shan Cyber. We help young people and businesses turn curiosity into capability, with practical digital skills, creative services, and technology that makes everyday life better.</p><a className="text-link" href="https://www.youtube.com/@kltechtips163" target="_blank" rel="noopener noreferrer">Get to know our community <span>↗</span></a></div></div></section>
+ <section className="shell section"><div className="section-heading"><div><div className="eyebrow">02 / MADE FOR YOU</div><h2>Small tools. Big possibilities.</h2></div><Link className="text-link" href="/product">Explore all products <span>↗</span></Link></div><div className="product-grid">{products.slice(0,3).map((p,i)=><a className="product-card" key={p.id} href={p.link} target="_blank" rel="noopener noreferrer"><div className={`product-art product-art-${i}`} aria-hidden="true">{i===0?<><span className="game-team">←</span><span className="game-rope"/><span className="game-team">→</span><small>PLAY. LEARN. TOGETHER.</small></>:i===1?<div className="keyboard"><b>Make every keystroke count.</b><div>{"QWERTYUIOP".split("").map(k=><span key={k}>{k}</span>)}</div><div>{"ASDFGHJKL".split("").map(k=><span key={k}>{k}</span>)}</div><div>{"ZXCVBNM".split("").map(k=><span key={k}>{k}</span>)}</div></div>:<div className="excel-art">X <span>Learn by doing.<br/><small>Build your spreadsheet skills.</small></span></div>}</div><div className="product-info"><span className="card-eyebrow">DIGITAL TOOLS</span><h3>{p.title} <span>↗</span></h3><p>{p.description}</p></div></a>)}</div></section>
+ <section className="shell section journal-section"><div className="section-heading"><div><div className="eyebrow">03 / KEEP YOUR CURIOSITY</div><h2>A little knowledge goes a long way.</h2></div><Link className="text-link" href="/blog">Visit the journal <span>↗</span></Link></div><div className="journal-grid">{recent.map(p=><Link className="journal-card" key={p.id} href={`/blog/${p.id}`}><div className="journal-visual"><span>THE DIGITAL<br/>WORLD, EXPLAINED.</span><b>↗</b></div><div><span className="card-eyebrow">{p.date} · JOURNAL</span><h3>{p.title}</h3><p>{p.excerpt}</p><span className="text-link">Read the story ↗</span></div></Link>)}</div></section>
+ <section className="shell faq-section"><div><div className="eyebrow">A FEW HELPFUL ANSWERS</div><h2>Curious? Start here.</h2></div><div>{[["What can Shan Cyber help me with?","We provide computer repairs, IT equipment, web design and development, and graphic design. We also share practical digital learning resources."],["Where can I start learning?","Explore our digital tools or visit our YouTube channel for practical technology tips and tutorials."],["How do I discuss a project?","Reach out through our Facebook page using the contact link below. Tell us what you have in mind so we can discuss the next steps."]].map(([q,a])=><details key={q}><summary>{q}<span>+</span></summary><p>{a}</p></details>)}</div></section>
+ <section className="shell contact-section" id="contact"><div><div className="eyebrow">YOUR NEXT CHAPTER STARTS HERE</div><h2>Have an idea?<br/>Let’s make it happen.</h2></div><div><p>A question, a project, or just a spark of an idea.<br/>We’d love to hear from you.</p><a className="button button-dark" href="https://www.facebook.com/profile.php?id=100091377146699" target="_blank" rel="noopener noreferrer">Let’s start a conversation <span>↗</span></a></div><span className="contact-star" aria-hidden="true">✳</span></section></>;
 }

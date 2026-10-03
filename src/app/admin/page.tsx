@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Container } from '@/components/Container';
 import { SectionTitle } from '@/components/SectionTitle';
 
-const AUTH_KEY = 'shancyber-admin-auth';
+
 
 type PostItem = {
   id: string;
@@ -69,21 +69,27 @@ export default function AdminPage() {
   const [editingProductId, setEditingProductId] = useState<string | null>(null);
   const [passwordForm, setPasswordForm] = useState({ currentPassword: '', newPassword: '' });
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const savedAuth = window.localStorage.getItem(AUTH_KEY);
-      if (savedAuth === 'true') {
-        setIsLoggedIn(true);
-      }
-    }
 
-    loadContent();
+
+  const adminFetch = useCallback(async (input: string, init?: RequestInit) => {
+    try {
+      const response = await fetch(input, init);
+      if (response.status === 401 || response.status === 403) {
+        setIsLoggedIn(false);
+        setLoginError('Please sign in with an administrator account.');
+      }
+      return response;
+    } catch {
+      return new Response(JSON.stringify({ message: 'Connection failed. Please try again.' }), {
+        status: 503, headers: { 'Content-Type': 'application/json' },
+      });
+    }
   }, []);
 
-  const loadContent = async () => {
+  const loadContent = useCallback(async () => {
     const [postResponse, productResponse] = await Promise.all([
-      fetch('/api/posts'),
-      fetch('/api/products'),
+      adminFetch('/api/posts'),
+      adminFetch('/api/products'),
     ]);
 
     if (postResponse.ok) {
@@ -95,32 +101,43 @@ export default function AdminPage() {
       const productData = await productResponse.json();
       setProducts(productData);
     }
-  };
+  }, [adminFetch]);
+
+  useEffect(() => {
+    fetch('/api/admin/session', { cache: 'no-store' })
+      .then(response => setIsLoggedIn(response.ok))
+      .catch(() => setIsLoggedIn(false));
+    loadContent();
+  }, [loadContent]);
 
   const handleLogin = async (event: React.FormEvent) => {
     event.preventDefault();
-    const response = await fetch('/api/admin/login', {
+    const response = await adminFetch('/api/admin/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({ email: username, password }),
     });
 
     if (response.ok) {
-      window.localStorage.setItem(AUTH_KEY, 'true');
+      setPassword('');
       setIsLoggedIn(true);
       setLoginError('');
       setFeedback('Welcome back. You can manage content now.');
       await loadContent();
     } else {
       const data = await response.json().catch(() => ({}));
-      setLoginError(data.message || 'Invalid username or password.');
+      setLoginError(data.message || 'Invalid email or password.');
     }
   };
 
-  const handleLogout = () => {
-    window.localStorage.removeItem(AUTH_KEY);
+  const handleLogout = async () => {
+    const response = await adminFetch('/api/admin/logout', { method: 'POST' });
     setIsLoggedIn(false);
-    setFeedback('You have been logged out.');
+    setPassword('');
+    setPostForm(initialPostForm);
+    setProductForm(initialProductForm);
+    setPasswordForm({ currentPassword: '', newPassword: '' });
+    setFeedback(response.ok ? 'You have been logged out.' : 'Signed out of this screen. If your connection is offline, retry logout when it returns.');
   };
 
   const handleCreatePost = async (event: React.FormEvent) => {
@@ -128,7 +145,7 @@ export default function AdminPage() {
     setIsSubmitting(true);
     setFeedback('');
 
-    const response = await fetch('/api/posts', {
+    const response = await adminFetch('/api/posts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -159,7 +176,7 @@ export default function AdminPage() {
     }
 
     setIsSubmitting(true);
-    const response = await fetch(`/api/posts/${editingPostId}`, {
+    const response = await adminFetch(`/api/posts/${encodeURIComponent(editingPostId)}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -185,7 +202,7 @@ export default function AdminPage() {
   };
 
   const handleDeletePost = async (id: string) => {
-    const response = await fetch(`/api/posts/${id}`, {
+    const response = await adminFetch(`/api/posts/${encodeURIComponent(id)}`, {
       method: 'DELETE',
     });
 
@@ -200,7 +217,7 @@ export default function AdminPage() {
     setIsSubmitting(true);
     setFeedback('');
 
-    const response = await fetch('/api/products', {
+    const response = await adminFetch('/api/products', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(productForm),
@@ -225,7 +242,7 @@ export default function AdminPage() {
     }
 
     setIsSubmitting(true);
-    const response = await fetch(`/api/products/${editingProductId}`, {
+    const response = await adminFetch(`/api/products/${encodeURIComponent(editingProductId)}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(productForm),
@@ -245,7 +262,7 @@ export default function AdminPage() {
   };
 
   const handleDeleteProduct = async (id: string) => {
-    const response = await fetch(`/api/products/${id}`, {
+    const response = await adminFetch(`/api/products/${encodeURIComponent(id)}`, {
       method: 'DELETE',
     });
 
@@ -280,7 +297,7 @@ export default function AdminPage() {
 
   const handlePasswordChange = async (event: React.FormEvent) => {
     event.preventDefault();
-    const response = await fetch('/api/admin/password', {
+    const response = await adminFetch('/api/admin/password', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(passwordForm),
@@ -311,12 +328,15 @@ export default function AdminPage() {
         <form onSubmit={handleLogin} className="mx-auto max-w-md rounded-xl border border-gray-200 bg-white p-8 shadow-sm dark:border-gray-700 dark:bg-gray-800">
           <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">Admin Login</h2>
           <p className="mb-6 text-sm text-gray-600 dark:text-gray-400">
-            Use your admin credentials to access the dashboard.
+            Sign in with your Supabase administrator email. Sessions expire after one hour; sign in again to continue editing.
           </p>
           <div className="space-y-4">
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">Username</label>
+              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">Email</label>
               <input
+                type="email"
+                autoComplete="username"
+                required
                 value={username}
                 onChange={(event) => setUsername(event.target.value)}
                 className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-indigo-500 dark:border-gray-600 dark:bg-gray-900"
@@ -327,6 +347,8 @@ export default function AdminPage() {
               <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">Password</label>
               <input
                 type="password"
+                autoComplete="current-password"
+                required
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-indigo-500 dark:border-gray-600 dark:bg-gray-900"
@@ -471,7 +493,7 @@ export default function AdminPage() {
                   </div>
                   <div>
                     <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">New Password</label>
-                    <input type="password" value={passwordForm.newPassword} onChange={(event) => setPasswordForm({ ...passwordForm, newPassword: event.target.value })} className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-indigo-500 dark:border-gray-600 dark:bg-gray-900" />
+                    <input type="password" minLength={12} required autoComplete="new-password" value={passwordForm.newPassword} onChange={(event) => setPasswordForm({ ...passwordForm, newPassword: event.target.value })} className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-indigo-500 dark:border-gray-600 dark:bg-gray-900" />
                   </div>
                 </div>
                 <button type="submit" className="mt-4 rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700">Update Password</button>
