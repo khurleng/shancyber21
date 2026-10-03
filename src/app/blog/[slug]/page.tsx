@@ -98,11 +98,11 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
         <p className="mb-3 text-sm font-medium text-gray-500 dark:text-gray-400">
           {article.date}
         </p>
-        <h1 className="mb-6 text-4xl font-bold tracking-normal text-gray-900 dark:text-white">
+        <h1 className="shan-text mb-6 text-4xl font-bold leading-relaxed tracking-normal text-gray-900 dark:text-white">
           {article.title}
         </h1>
 
-        <div className="space-y-5">
+        <div className="shan-text space-y-5">
           {article.content.map((paragraph) => (
             <div key={paragraph}>{renderRichContent(paragraph)}</div>
           ))}
