@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Container } from '@/components/Container';
 import { SectionTitle } from '@/components/SectionTitle';
+import { ImageUrlPreview } from '@/components/ImageUrlPreview';
 
 
 
@@ -393,6 +394,7 @@ export default function AdminPage() {
                   <div>
                     <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">Image URL</label>
                     <input value={postForm.image} onChange={(event) => setPostForm({ ...postForm, image: event.target.value })} className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-indigo-500 dark:border-gray-600 dark:bg-gray-900" />
+                    <ImageUrlPreview src={postForm.image} />
                   </div>
                   <div className="md:col-span-2">
                     <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">Excerpt</label>
@@ -431,6 +433,7 @@ export default function AdminPage() {
                   <div>
                     <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">Image URL</label>
                     <input value={productForm.image} onChange={(event) => setProductForm({ ...productForm, image: event.target.value })} className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-indigo-500 dark:border-gray-600 dark:bg-gray-900" />
+                    <ImageUrlPreview src={productForm.image} />
                   </div>
                   <div>
                     <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">Link</label>

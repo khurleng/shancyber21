@@ -92,6 +92,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
         <img
           src={article.image}
           alt={article.title}
+          referrerPolicy="no-referrer"
           className="mb-8 h-72 w-full rounded-lg object-cover"
         />
 
